@@ -1,0 +1,11 @@
+# PAUSE reviewer walkthrough
+
+This companion to the PAUSE paper shows how a sleep staging model can decide whether to stop EEG acquisition or collect another second of signal.
+
+Open [index.html](index.html) in a browser from the `presentation/` folder. Keep `style.css`, `replay.js`, `evidence.js`, and `risk-trajectories.png` beside it. The walkthrough runs offline; it needs no server, installation, account, or name. It sends no telemetry.
+
+1. In the replay, choose an acquisition cost. Use **Acquire 1 s** to advance one decision at a time, **Play** to run the sequence, or **Reset** to start over. Try both costs and compare when the policy stops and which endpoint is carried into the next epoch. The two examples illustrate the decision rule in §IV (Fig. 1 and Algorithm 1). The traces are hand-authored; the page does not run the trained model or analyze a recording.
+2. Inspect **Fig. 6** (supplement §VII-C) to see the risk trajectories reported in the paper. Compare the risk of stopping now with the risk of acquiring another patch and deciding later.
+3. Use the dataset selector to inspect the results for DREAMS-SUB, Sleep-EDF-20, Sleep-EDF-78, and SHHS. The classification and signal usage results come from the paper’s evaluation (§V-B, Fig. 2; §V-D, Fig. 3; and §V-E, Fig. 4). Analog front-end power is estimated from datasheet values (§V-G, Table VII). The mobile-host inference latency was measured separately (Table VIII). Neither reports total wearable energy use.
+
+**Sharing note for maintainers.** The [ICDE 2027 research-track call](https://icde2027.github.io/cf-research-papers.html) specifies single-blind review and asks authors to use a standard, openly accessible service for supplemental artifacts. If this walkthrough is shared for review, include its files with the reproducibility materials in an openly accessible artifact repository such as a public GitHub repo. Reviewers can download the files and open them locally. The artifact URL is for retrieving the files; avoid directing reviewers to a personal site or other hosted demo that could identify them. The walkthrough is optional and does not replace the code, data, or instructions needed to reproduce the paper’s results.

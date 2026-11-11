@@ -1,0 +1,38 @@
+# macOS / external drive metadata
+.DS_Store
+._*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+.worktrees/
+
+# Jupyter
+.ipynb_checkpoints/
+
+*.pt
+*.ckpt
+events.out.tfevents.*
+
+# Review-package artifacts under code/
+code/dataset/DREAMS/
+code/dataset/EDF20/
+code/dataset/EDF78/
+code/dataset/SHHS/
+
+code/checkpoint/**
+!code/checkpoint/.gitkeep
+
+code/outputs/**
+!code/outputs/calibration/
+!code/outputs/logs/
+
+!code/outputs/calibration/.gitkeep
+!code/outputs/logs/.gitkeep
+*.pth

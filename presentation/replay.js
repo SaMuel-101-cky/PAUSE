@@ -55,19 +55,19 @@
     const x = k => 39 + (k - 1) * 12.45;
     const y = value => 133 - value * 175;
     for (const value of [0, .2, .4, .6]) {
-      svgNode('line', { x1: 39, x2: 400, y1: y(value), y2: y(value), stroke: '#3a514a' });
-      svgNode('text', { x: 30, y: y(value) + 4, 'text-anchor': 'end', fill: '#b3c7bd', 'font-size': 11 }, value.toFixed(1));
+      svgNode('line', { x1: 39, x2: 400, y1: y(value), y2: y(value), stroke: 'var(--plot-grid)' });
+      svgNode('text', { x: 30, y: y(value) + 4, 'text-anchor': 'end', fill: 'var(--dim)', 'font-size': 11 }, value.toFixed(1));
     }
     for (const k of [1, 5, 10, 15, 20, 25, 30]) {
-      svgNode('text', { x: x(k), y: 151, 'text-anchor': 'middle', fill: '#b3c7bd', 'font-size': 11 }, String(k));
+      svgNode('text', { x: x(k), y: 151, 'text-anchor': 'middle', fill: 'var(--dim)', 'font-size': 11 }, String(k));
     }
-    svgNode('text', { x: 400, y: 168, 'text-anchor': 'end', fill: '#b3c7bd', 'font-size': 11 }, 'ACQUIRED PREFIX (s)');
+    svgNode('text', { x: 400, y: 168, 'text-anchor': 'end', fill: 'var(--dim)', 'font-size': 11 }, 'ACQUIRED PREFIX (s)');
     if (!row.acquired) return;
     if (row.done && row.acquired < horizon) {
-      svgNode('rect', { x: x(row.acquired) + 3, y: 28, width: 397 - x(row.acquired), height: 105, fill: '#23342e' });
-      svgNode('text', { x: 396, y: 43, 'text-anchor': 'end', fill: '#b3c7bd', 'font-size': 11 }, 'SUFFIX UNOBSERVED');
+      svgNode('rect', { x: x(row.acquired) + 3, y: 28, width: 397 - x(row.acquired), height: 105, fill: 'var(--plot-suffix)' });
+      svgNode('text', { x: 396, y: 43, 'text-anchor': 'end', fill: 'var(--dim)', 'font-size': 11 }, 'SUFFIX UNOBSERVED');
     }
-    const series = [[row.trace.stop, 0, '#ffce86', 'none'], [row.trace.next, cost, '#a9ffce', '5 4']];
+    const series = [[row.trace.stop, 0, 'var(--endpoint)', 'none'], [row.trace.next, cost, 'var(--blue)', '5 4']];
     for (const [values, add, stroke, dash] of series) {
       const points = values.slice(0, row.acquired).map((value, index) => `${x(index + 1)},${y(value + add)}`);
       svgNode('polyline', { points: points.join(' '), fill: 'none', stroke, 'stroke-width': 2, 'stroke-dasharray': dash });
@@ -175,6 +175,7 @@
     const item = document.createElement('div');
     item.className = 'bar-row';
     const name = document.createElement('span');
+    name.className = 'bar-name';
     name.textContent = label;
     const track = document.createElement('div');
     track.className = 'bar-track';
@@ -185,7 +186,11 @@
     track.append(fill);
     const value = document.createElement('span');
     value.className = 'bar-value';
-    value.textContent = `${seconds.toFixed(2)} s · ${mf1.toFixed(2)}% MF1`;
+    const duration = document.createElement('strong');
+    duration.textContent = `${seconds.toFixed(2)} s`;
+    const score = document.createElement('span');
+    score.textContent = `${mf1.toFixed(2)}% MF1`;
+    value.append(duration, score);
     item.append(name, track, value);
     return item;
   }
@@ -195,10 +200,23 @@
     const { baseline, firstExceeds, gain } = row.system;
     const bars = document.createElement('div');
     bars.className = 'bars';
-    bars.append(bar('PAUSE', firstExceeds.seconds, firstExceeds.mf1), bar(`${baseline.name} at its peak`, baseline.seconds, baseline.mf1));
-    const note = document.createElement('p');
+    const scale = document.createElement('div');
+    scale.className = 'bar-scale';
+    scale.setAttribute('aria-hidden', 'true');
+    for (const tick of ['0', '15', '30 s']) {
+      const label = document.createElement('span');
+      label.textContent = tick;
+      scale.append(label);
+    }
+    bars.append(bar('PAUSE', firstExceeds.seconds, firstExceeds.mf1), bar(`${baseline.name} at its peak`, baseline.seconds, baseline.mf1), scale);
+    const note = document.createElement('div');
     note.className = 'data-note';
-    note.textContent = `${row.name}: the first evaluated PAUSE point above every baseline peak. Average matched-budget macro-F1 gain over the four-baseline envelope: +${gain.toFixed(1)} pp.`;
+    const figure = document.createElement('p');
+    figure.className = 'metric';
+    figure.textContent = `+${gain.toFixed(1)} pp`;
+    const context = document.createElement('p');
+    context.textContent = `Average macro-F1 gain on ${row.name} over the four-baseline envelope at matched acquisition budgets.`;
+    note.append(figure, context);
     results.replaceChildren(bars, note);
   }
 

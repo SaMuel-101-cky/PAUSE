@@ -3,62 +3,456 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="An offline walkthrough of PAUSE and stopping-dependent history for adaptive EEG acquisition.">
+  <meta name="description" content="An offline reviewer walkthrough of PAUSE (ICDE 2027) and stopping-dependent history for adaptive EEG acquisition.">
   <title>PAUSE — Stopping changes the history</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='4'%20fill='%231e40af'/%3E%3Ctext%20x='16'%20y='22'%20font-family='monospace'%20font-size='18'%20font-weight='700'%20text-anchor='middle'%20fill='%23ffffff'%3EII%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css">
   <script defer src="evidence.js"></script>
   <script defer src="replay.js"></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
+
   <header class="site-header shell">
     <a class="brand" href="#main" aria-label="PAUSE, top of page"><span class="mark" aria-hidden="true">Ⅱ</span> PAUSE</a>
-    <nav aria-label="Walkthrough"><a href="#replay">Walkthrough</a><a href="#evidence">Evidence</a><a href="#scope">Scope</a></nav>
+    <nav aria-label="Walkthrough">
+      <a href="#background">Background</a>
+      <a href="#replay">Replay</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#scope">System &amp; Scope</a>
+    </nav>
   </header>
+
   <main id="main">
     <section class="hero shell" aria-labelledby="title">
       <div class="hero-copy">
         <p class="label">ADAPTIVE EEG ACQUISITION · ICDE 2027</p>
         <h1 id="title">Stopping changes<br> <em>the history.</em></h1>
-        <p>PAUSE decides how much EEG to acquire for each sleep epoch. The point where it stops becomes part of the evidence for the next epoch.</p>
+        <p class="paper-title">Beyond Instance-Wise Early Classification: Adaptive EEG Acquisition with Stopping-Dependent History for Sleep Staging</p>
+        <p><strong>PAUSE (Prefix-Adaptive and Utility-Aware Stopping)</strong> decides how much single-channel EEG to acquire per 30 s sleep epoch. Where it stops determines both the current prediction and the historical context carried to future epochs.</p>
         <div class="hero-actions">
-          <a class="jump" href="#replay">Try the replay <span aria-hidden="true">↓</span></a>
-          <a class="text-link" href="#evidence">See study results</a>
+          <a class="jump" href="#background">Start 4-page brief <span aria-hidden="true">↓</span></a>
+          <a class="text-link" href="#replay">Try 2-epoch replay <span aria-hidden="true">↓</span></a>
         </div>
       </div>
       <div class="hero-diagram" role="img" aria-label="A contiguous prefix is acquired, its final patch supplies an endpoint summary, and the unacquired suffix is skipped until the next epoch.">
         <div class="schematic-head"><span>ACQUISITION SCHEMATIC</span><span>1 PATCH = 1 s</span></div>
         <svg viewBox="0 0 540 260" aria-hidden="true">
           <defs>
-            <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M 24 0 L 0 0 0 24" fill="none" stroke="#d7e4f7" stroke-width="1"/></pattern>
-            <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M-2 2L2-2M0 8L8 0M6 10L10 6" stroke="#95aaca" stroke-width="1"/></pattern>
+            <pattern id="hero-grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M 24 0 L 0 0 0 24" fill="none" stroke="#d7e4f7" stroke-width="1"/></pattern>
+            <pattern id="hero-hatch" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M-2 2L2-2M0 8L8 0M6 10L10 6" stroke="#95aaca" stroke-width="1"/></pattern>
           </defs>
-          <rect x="0" y="18" width="540" height="200" fill="url(#grid)"/>
+          <rect x="0" y="18" width="540" height="200" fill="url(#hero-grid)"/>
           <text x="10" y="42" class="svg-sub">EPOCH n</text>
           <rect x="10" y="61" width="203" height="71" fill="#d9e8ff"/>
-          <rect x="215" y="61" width="312" height="71" fill="url(#hatch)"/>
+          <rect x="215" y="61" width="312" height="71" fill="url(#hero-hatch)"/>
           <path d="M10 101h15l8-8 7 15 9-27 8 39 8-24 8 5h10l7-10 6 22 10-34 8 37 8-26 7 13h10l8 6 7-15 7 7h20l7-9 8 20 8-28 8 16h5" fill="none" stroke="var(--blue)" stroke-width="2"/>
           <path d="M213 53V164q0 13 13 13h68q10 0 10 10v32m-5-6 5 6 5-6" fill="none" stroke="var(--endpoint)" stroke-width="2"/>
           <circle cx="213" cy="101" r="5" fill="var(--endpoint)"/>
           <text x="228" y="54" class="svg-amber">STOP AT τ</text>
-          <text x="284" y="103" class="svg-muted">SUFFIX NOT ACQUIRED</text>
+          <text x="371" y="103" text-anchor="middle" class="svg-muted">SUFFIX NOT ACQUIRED</text>
           <text x="316" y="182" class="svg-amber">ENDPOINT SUMMARY</text>
           <rect x="294" y="225" width="233" height="28" fill="#d9e8ff" stroke="#91abd4"/>
-          <text x="305" y="243" class="svg-sub">EPOCH n+1 · ACQUISITION RESUMES</text>
+          <text x="410.5" y="243" text-anchor="middle" class="svg-sub">EPOCH n+1 · RESUMES</text>
         </svg>
+      </div>
+    </section>
+
+    <section class="shell section deck-section" id="background" aria-labelledby="background-title">
+      <div class="deck-head">
+        <div class="section-intro">
+          <p class="label">01–04 · RESEARCH BRIEF</p>
+          <h2 id="background-title">Why adaptive EEG needs stopping-dependent history</h2>
+          <p>Read the problem formulation and architecture across four structured pages.</p>
+        </div>
+      </div>
+
+      <div class="deck-tabs" id="deck-tabs" role="tablist" aria-label="Background and problem formulation pages">
+        <button type="button" class="deck-tab" id="deck-tab-1" role="tab" data-deck-page="1" aria-selected="true" aria-controls="deck-page-1" tabindex="0">01 · Sensing Bottleneck</button>
+        <button type="button" class="deck-tab" id="deck-tab-2" role="tab" data-deck-page="2" aria-selected="false" aria-controls="deck-page-2" tabindex="-1">02 · Why ECTS Breaks</button>
+        <button type="button" class="deck-tab" id="deck-tab-3" role="tab" data-deck-page="3" aria-selected="false" aria-controls="deck-page-3" tabindex="-1">03 · History Shift</button>
+        <button type="button" class="deck-tab" id="deck-tab-4" role="tab" data-deck-page="4" aria-selected="false" aria-controls="deck-page-4" tabindex="-1">04 · PAUSE Architecture</button>
+      </div>
+
+      <div class="deck-stage">
+        <article id="deck-page-1" class="deck-page deck-page--stacked" data-page="1" role="tabpanel" aria-labelledby="deck-tab-1">
+          <div class="deck-copy">
+            <p class="label">PAGE 01 / 04 · THE SENSING BOTTLENECK</p>
+            <h3>Model compression leaves the wearable EEG front end on</h3>
+            <p>Continuous sleep staging assigns one of five AASM stages (W, N1, N2, N3, REM) to consecutive 30 s epochs of 100 Hz single-channel EEG. Because battery-powered sensor nodes acquire and transmit data independently of the host performing inference, compressing the classifier alone leaves sensing power untouched.</p>
+            <ul class="deck-points">
+              <li><strong>Compact 30 s classifiers still sense continuously:</strong> TinySleepNet and Micro SleepNet shrink neural compute on the host, yet demand complete 30 s inputs—keeping the Analog Front-End (AFE) powered 30/30 s (e.g., ADS1299-4 draws <strong>22.0 mW</strong> active vs. <strong>5.1 mW</strong> standby).</li>
+              <li><strong>Offline masking blocks closed-loop control:</strong> MASS cuts nominal observation ratios via random masks, but relies on bidirectional future context across 32-epoch blocks (960 s), incurring a <strong>495 s</strong> mean label-availability delay (30–960 s).</li>
+              <li><strong>Online prefix stopping puts the front end to sleep:</strong> Acquiring a contiguous causal prefix and issuing a stop command at τ<sub>n</sub> moves the AFE into standby while emitting the stage label immediately.</li>
+            </ul>
+            <p class="source">Manuscript §I–II, §V-G · Supplement §VII-A, Table XXIX</p>
+          </div>
+
+          <aside class="deck-visual afe-panel" aria-label="AFE power and label-latency snapshot">
+            <div class="schematic-head"><span>AFE POWER &amp; LATENCY SNAPSHOT</span><span>MANUSCRIPT TABLE VII</span></div>
+            <p class="afe-basis">At first-exceed points (3.62–4.94 s) vs. baseline peak-MF1 points</p>
+            <div class="afe-list">
+              <div class="afe-row">
+                <div class="afe-row-top">
+                  <strong>ADS1299-4</strong>
+                  <span class="afe-spec">22.0 mW active · 5.1 mW standby</span>
+                </div>
+                <div class="afe-bar-track" aria-hidden="true">
+                  <span class="afe-bar-active" style="width: 34.1%"></span>
+                  <span class="afe-bar-standby" style="width: 23.2%"></span>
+                </div>
+                <div class="afe-row-bot">
+                  <span>PAUSE: 7.14–7.88 mW</span>
+                  <span class="afe-save">−45.2% to −67.5% vs. baseline peaks</span>
+                </div>
+              </div>
+              <div class="afe-row">
+                <div class="afe-row-top">
+                  <strong>ADS131A04</strong>
+                  <span class="afe-spec">15.8 mW active · 2.6 mW standby</span>
+                </div>
+                <div class="afe-bar-track" aria-hidden="true">
+                  <span class="afe-bar-active" style="width: 28.4%"></span>
+                  <span class="afe-bar-standby" style="width: 16.5%"></span>
+                </div>
+                <div class="afe-row-bot">
+                  <span>PAUSE: 4.19–4.77 mW</span>
+                  <span class="afe-save">−52.3% to −73.4% vs. baseline peaks</span>
+                </div>
+              </div>
+              <div class="afe-row">
+                <div class="afe-row-top">
+                  <strong>ADS1294</strong>
+                  <span class="afe-spec">10.1 mW active · 4.0 mW standby</span>
+                </div>
+                <div class="afe-bar-track" aria-hidden="true">
+                  <span class="afe-bar-active" style="width: 48.2%"></span>
+                  <span class="afe-bar-standby" style="width: 39.6%"></span>
+                </div>
+                <div class="afe-row-bot">
+                  <span>PAUSE: 4.74–5.00 mW</span>
+                  <span class="afe-save">−31.0% to −53.1% vs. baseline peaks</span>
+                </div>
+              </div>
+            </div>
+            <div class="afe-kpis">
+              <div class="afe-kpi">
+                <p class="afe-kpi-val">54.5%–84.5%</p>
+                <p class="afe-kpi-label">Standby share of remaining PAUSE AFE power (next gains require lower-standby hardware)</p>
+              </div>
+              <div class="afe-kpi">
+                <p class="afe-kpi-val">23.6×–165.0×</p>
+                <p class="afe-kpi-label">Faster label output vs. offline MASS across 3.0–21.0 s ceilings (Table XXIX; 100×–137× at 3.62–4.94 s first-exceed points)</p>
+              </div>
+            </div>
+            <p class="source">Manuscript §V-G, Table VII · Supplement §VII-A, Table XXIX</p>
+          </aside>
+
+          <div class="wearable-section" aria-label="Typical Wearable EEG form factors">
+            <div class="wearable-head">
+              <p class="label">TYPICAL WEARABLE EEG FORM FACTORS</p>
+              <span class="source">Battery-constrained acquisition nodes referenced in Manuscript [5], [6], [29]</span>
+            </div>
+            <div class="wearable-gallery">
+              <figure class="wearable-card">
+                <a href="wearable-sciadv-patch.png" class="wearable-media" aria-label="Open full-resolution photo of soft wireless forehead and face sleep patch (Kwon et al., Science Advances 2023)">
+                  <img src="wearable-sciadv-patch.png" alt="Soft wireless forehead and face sleep monitoring patch (Kwon et al., Science Advances 2023, Ref. [5], Photo: Georgia Tech / Yeo Lab)." width="300" height="450">
+                </a>
+                <figcaption>
+                  <strong>Soft Wireless Forehead/Face Patch</strong>
+                  <span>Kwon et al., <em>Science Advances</em> 2023 [5] (Photo: Georgia Tech / Yeo Lab)</span>
+                </figcaption>
+              </figure>
+              <figure class="wearable-card">
+                <a href="wearable-biogap-node.png" class="wearable-media" aria-label="Open full-resolution figure of BioGAP-Ultra modular dry-EEG headband and miniature sensor node (Frey et al., arXiv 2025)">
+                  <img src="wearable-biogap-node.png" alt="BioGAP-Ultra modular dry-EEG headband and 26 by 30 by 13 millimeter miniature sensor PCB (Frey et al., BioGAP-Ultra, arXiv 2025, Ref. [6])." width="979" height="894">
+                </a>
+                <figcaption>
+                  <strong>Modular Dry-EEG Headband &amp; Node (26×30×13 mm³)</strong>
+                  <span>Frey et al., <em>BioGAP-Ultra</em>, arXiv 2025 [6]</span>
+                </figcaption>
+              </figure>
+              <figure class="wearable-card">
+                <a href="wearable-scirep-headband.png" class="wearable-media" aria-label="Open full-resolution figure of wireless sleep headband streaming via BLE (Nguyen et al., Scientific Reports 2023)">
+                  <img src="wearable-scirep-headband.png" alt="Wireless sleep headband streaming EEG via BLE to a real-time monitoring pipeline (Nguyen et al., Scientific Reports 2023, Ref. [29], CC BY 4.0)." width="2007" height="1270">
+                </a>
+                <figcaption>
+                  <strong>Wireless Sleep Headband &amp; BLE Streaming</strong>
+                  <span>Nguyen et al., <em>Scientific Reports</em> 2023 [29] (CC BY 4.0)</span>
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+
+          <div class="deck-visual separation-diagram">
+            <div class="schematic-head"><span>SEPARATED ACQUISITION VS. COMPUTE ARCHITECTURE</span><span>WHY SENSING DOMINATES NODE BATTERY</span></div>
+            <svg viewBox="0 0 920 265" role="img" aria-label="Architecture diagram separating the battery-powered wearable acquisition node (electrodes, AFE/ADC at 22.0 mW active vs 5.1 mW standby, sensor transmitter) from the separately powered phone or edge compute node (9.44 ms/patch inference), contrasting Full 30 s, Offline MASS (495 s delay), and PAUSE online prefix stopping.">
+              <rect x="0" y="0" width="920" height="265" fill="#fbfdff"/>
+
+              <rect x="14" y="12" width="372" height="184" rx="8" fill="#fffaf5" stroke="#a44813" stroke-width="1.5"/>
+              <text x="28" y="33" fill="var(--endpoint)" font-size="11.5" font-weight="700">ACQUISITION NODE</text>
+              <text x="372" y="33" fill="var(--dim)" font-size="10.5" text-anchor="end">Wearable · Small Battery</text>
+
+              <rect x="28" y="48" width="84" height="48" rx="4" fill="#ffffff" stroke="#d9a67e"/>
+              <text x="70" y="69" fill="var(--text)" font-size="10.5" text-anchor="middle">Electrodes</text>
+              <text x="70" y="85" fill="var(--dim)" font-size="9.5" text-anchor="middle">100 Hz EEG</text>
+
+              <line x1="112" y1="72" x2="123" y2="72" stroke="#a44813" stroke-width="1.6"/>
+              <polygon points="127,72 121,69 121,75" fill="#a44813"/>
+
+              <rect x="128" y="48" width="160" height="48" rx="4" fill="#ffedd5" stroke="#a44813"/>
+              <text x="208" y="67" fill="var(--endpoint)" font-size="10" font-weight="700" text-anchor="middle">AFE &amp; ADC (ADS1299-4)</text>
+              <text x="208" y="84" fill="var(--text)" font-size="9.5" text-anchor="middle">22.0 mW on / 5.1 mW stby</text>
+
+              <line x1="288" y1="72" x2="299" y2="72" stroke="#a44813" stroke-width="1.6"/>
+              <polygon points="303,72 297,69 297,75" fill="#a44813"/>
+
+              <rect x="304" y="48" width="68" height="48" rx="4" fill="#ffffff" stroke="#d9a67e"/>
+              <text x="338" y="69" fill="var(--text)" font-size="10" text-anchor="middle">Sensor Tx</text>
+              <text x="338" y="85" fill="var(--dim)" font-size="9.5" text-anchor="middle">Stream</text>
+
+              <rect x="28" y="110" width="344" height="72" rx="5" fill="#ffedd5" stroke="#c86b33"/>
+              <text x="40" y="129" fill="var(--endpoint)" font-size="10.5" font-weight="700">UNRESOLVED SENSING BOTTLENECK:</text>
+              <text x="40" y="147" fill="var(--text)" font-size="9.8">Classifier compression leaves 30/30 s AFE sensing on.</text>
+              <text x="40" y="165" fill="var(--text)" font-size="9.8">Early stop at τ_n puts AFE into 5.1 mW standby.</text>
+
+              <line x1="392" y1="64" x2="520" y2="64" stroke="#1e40af" stroke-width="2"/>
+              <polygon points="528,64 520,60 520,68" fill="#1e40af"/>
+              <text x="460" y="54" fill="var(--blue)" font-size="10.5" text-anchor="middle">1 s EEG patches →</text>
+
+              <rect x="402" y="79" width="116" height="24" rx="12" fill="#f1f6ff" stroke="#91abd4"/>
+              <text x="460" y="95" fill="var(--dim)" font-size="10" text-anchor="middle">ACQUISITION LINK</text>
+
+              <line x1="528" y1="130" x2="400" y2="130" stroke="#15803d" stroke-width="2" stroke-dasharray="5 3"/>
+              <polygon points="392,130 400,126 400,134" fill="#15803d"/>
+              <text x="460" y="148" fill="var(--continue)" font-size="9.5" font-weight="700" text-anchor="middle">← Stop command at τ_n</text>
+
+              <rect x="534" y="12" width="372" height="184" rx="8" fill="#f8fbff" stroke="#1e40af" stroke-width="1.5"/>
+              <text x="548" y="33" fill="var(--blue)" font-size="11.5" font-weight="700">COMPUTE NODE</text>
+              <text x="892" y="33" fill="var(--dim)" font-size="10.5" text-anchor="end">Phone / Edge Host · Separate Power</text>
+
+              <rect x="548" y="48" width="344" height="48" rx="4" fill="#dbeafe" stroke="#1e40af"/>
+              <text x="720" y="67" fill="var(--blue)" font-size="10.5" font-weight="700" text-anchor="middle">NEURAL INFERENCE &amp; STOPPER</text>
+              <text x="720" y="85" fill="var(--text)" font-size="10" text-anchor="middle">9.44 ms/patch median · 0.25% CPU duty cycle</text>
+
+              <rect x="548" y="110" width="344" height="72" rx="5" fill="#ffffff" stroke="#91abd4"/>
+              <text x="560" y="129" fill="var(--blue)" font-size="10.5" font-weight="700">MODEL COMPRESSION SCOPE:</text>
+              <text x="560" y="147" fill="var(--text)" font-size="10">TinySleepNet &amp; Micro SleepNet save compute ONLY here.</text>
+              <text x="560" y="165" fill="var(--dim)" font-size="10">PAUSE trims sensor duty via causal stop decision τ_n.</text>
+
+              <rect x="14" y="210" width="288" height="42" rx="6" fill="#ffffff" stroke="#cbd5e1"/>
+              <text x="26" y="227" fill="var(--text)" font-size="10" font-weight="700">1. FULL 30 s PIPELINE</text>
+              <text x="26" y="243" fill="var(--dim)" font-size="10">22.0 mW AFE (30/30 s) · label @ 30 s</text>
+
+              <rect x="316" y="210" width="288" height="42" rx="6" fill="#fff7ed" stroke="#d9a67e"/>
+              <text x="328" y="227" fill="var(--endpoint)" font-size="10" font-weight="700">2. OFFLINE MASKING (MASS)</text>
+              <text x="328" y="243" fill="var(--text)" font-size="10">495 s mean delay (bidir. L = 32)</text>
+
+              <rect x="618" y="210" width="288" height="42" rx="6" fill="#dcfce7" stroke="#15803d"/>
+              <text x="630" y="227" fill="var(--continue)" font-size="10" font-weight="700">3. ONLINE PREFIX (PAUSE)</text>
+              <text x="630" y="243" fill="var(--text)" font-size="10">Stop @ τ_n → standby 5.1 mW · online</text>
+            </svg>
+            <p class="source">AFE power modeled from datasheets (Table VII); wireless radio energy/RTT outside scope.</p>
+          </div>
+        </article>
+
+        <article id="deck-page-2" class="deck-page" data-page="2" role="tabpanel" aria-labelledby="deck-tab-2" hidden>
+          <div class="deck-copy">
+            <p class="label">PAGE 02 / 04 · DEPENDENT SLEEP STREAMS</p>
+            <h3>Conventional ECTS treats dependent sleep epochs as independent</h3>
+            <p>Early Classification of Time Series (ECTS) provides a natural starting point for adaptive acquisition, yet its standard formulation treats successive series–label pairs as i.i.d. instances evaluated in isolation.</p>
+            <div class="equation-box" aria-label="Equation 1, instance-wise observation">
+              <span class="eq-tag">EQ. (1) · INSTANCE-WISE ECTS</span>
+              <code>O<sub>n,k</sub><sup>inst</sup> = X<sub>n,1:k</sub></code>
+              <p>Stopping times and observations from earlier epochs <code>1..n-1</code> never enter the current prediction.</p>
+            </div>
+            <ul class="deck-points">
+              <li><strong>Cross-epoch dependence matters:</strong> Sleep stages unfold along structured physiological transitions where prior epochs anchor ambiguous patterns.</li>
+              <li><strong>Minority stages suffer most:</strong> Transitional stage <strong>N1</strong> accounts for only <strong>3.2%–12.5%</strong> of epochs across the four evaluated datasets. Because N1 is a brief transitional sleep-onset stage lacking strong local waveform markers and REM’s single-channel EEG overlaps with W and N1, short prefixes depend heavily on prior-epoch transition context.</li>
+              <li><strong>Instance-wise baselines stall:</strong> Methods like EARLIEST, ECONOMY-γ-Max, EarlyMix, and FIRMBOUND either drop N1 accuracy or require 23.7–29.8 s of EEG at their peaks.</li>
+            </ul>
+            <p class="source">Manuscript §I, §II-B, §III (Eq. 1), §V-B</p>
+          </div>
+          <div class="deck-visual">
+            <div class="schematic-head"><span>INSTANCE-WISE VS. STREAM CONTEXT</span><span>CROSS-EPOCH LINK</span></div>
+            <svg viewBox="0 0 500 288" role="img" aria-label="Contrast between isolated i.i.d. ECTS epochs with no cross-epoch link and a temporally dependent sleep stream where preceding endpoints resolve N1 and REM.">
+              <rect x="0" y="0" width="500" height="288" fill="#fbfdff"/>
+
+              <rect x="12" y="14" width="476" height="118" rx="8" fill="#ffffff" stroke="#d6e2f2"/>
+              <text x="24" y="34" fill="var(--text)" font-size="11">CONVENTIONAL ECTS (i.i.d. · Eq. 1)</text>
+              <rect x="24" y="48" width="124" height="58" rx="4" fill="#f1f6ff" stroke="#a8bad6"/>
+              <text x="86" y="70" fill="var(--text)" font-size="11" text-anchor="middle">EPOCH n-1</text>
+              <text x="86" y="88" fill="var(--dim)" font-size="10.5" text-anchor="middle">N2 · isolated</text>
+
+              <text x="167" y="79" fill="var(--endpoint)" font-size="16" text-anchor="middle">×</text>
+              <text x="167" y="96" fill="var(--dim)" font-size="9.5" text-anchor="middle">NO LINK</text>
+
+              <rect x="188" y="48" width="124" height="58" rx="4" fill="#fff7ed" stroke="#a44813"/>
+              <text x="250" y="70" fill="var(--endpoint)" font-size="11" text-anchor="middle">EPOCH n (N1?)</text>
+              <text x="250" y="88" fill="var(--dim)" font-size="10.5" text-anchor="middle">X_n,1:k alone</text>
+
+              <text x="331" y="79" fill="var(--endpoint)" font-size="16" text-anchor="middle">×</text>
+              <text x="331" y="96" fill="var(--dim)" font-size="9.5" text-anchor="middle">NO LINK</text>
+
+              <rect x="352" y="48" width="124" height="58" rx="4" fill="#f1f6ff" stroke="#a8bad6"/>
+              <text x="414" y="70" fill="var(--text)" font-size="11" text-anchor="middle">EPOCH n+1</text>
+              <text x="414" y="88" fill="var(--dim)" font-size="10.5" text-anchor="middle">REM · isolated</text>
+              <text x="24" y="122" fill="var(--endpoint)" font-size="10.5">N1 (3.2%–12.5%) lacks preceding transition context.</text>
+
+              <rect x="12" y="146" width="476" height="128" rx="8" fill="#f1f6ff" stroke="#91abd4"/>
+              <text x="24" y="168" fill="var(--blue)" font-size="11" font-weight="700">DEPENDENT SLEEP STREAM (PAUSE)</text>
+              <rect x="24" y="182" width="124" height="58" rx="4" fill="#ffffff" stroke="#1e40af"/>
+              <text x="86" y="204" fill="var(--text)" font-size="11" text-anchor="middle">EPOCH n-1</text>
+              <text x="86" y="222" fill="var(--blue)" font-size="9.5" text-anchor="middle">N2 · endpoint h<tspan dy="2.5" font-size="7.5">n-1,τ</tspan></text>
+
+              <line x1="148" y1="211" x2="184" y2="211" stroke="#a44813" stroke-width="2"/>
+              <polygon points="188,211 180,207 180,215" fill="#a44813"/>
+              <text x="168" y="200" fill="var(--endpoint)" font-size="8.5" text-anchor="middle">h<tspan dy="2" font-size="6.5">n-1,τ</tspan></text>
+
+              <rect x="188" y="182" width="124" height="58" rx="4" fill="#ffffff" stroke="#1e40af" stroke-width="1.8"/>
+              <text x="250" y="204" fill="var(--blue)" font-size="11" text-anchor="middle">EPOCH n → N1</text>
+              <text x="250" y="222" fill="var(--dim)" font-size="9.5" text-anchor="middle">(h<tspan dy="2.5" font-size="7.5">&lt;n</tspan><tspan dy="-2.5">, X</tspan><tspan dy="2.5" font-size="7.5">n,1:k</tspan><tspan dy="-2.5">)</tspan></text>
+
+              <line x1="312" y1="211" x2="348" y2="211" stroke="#a44813" stroke-width="2"/>
+              <polygon points="352,211 344,207 344,215" fill="#a44813"/>
+              <text x="332" y="200" fill="var(--endpoint)" font-size="9.5" text-anchor="middle">h<tspan dy="2" font-size="7">n</tspan></text>
+
+              <rect x="352" y="182" width="124" height="58" rx="4" fill="#ffffff" stroke="#1e40af"/>
+              <text x="414" y="204" fill="var(--text)" font-size="11" text-anchor="middle">EPOCH n+1</text>
+              <text x="414" y="222" fill="var(--blue)" font-size="9.5" text-anchor="middle">REM + (h<tspan dy="2.5" font-size="7.5">&lt;n</tspan><tspan dy="-2.5">, h</tspan><tspan dy="2.5" font-size="7.5">n</tspan><tspan dy="-2.5">)</tspan></text>
+              <text x="24" y="260" fill="var(--continue)" font-size="9.8">Prior endpoints h<tspan dy="2.5" font-size="7.5">&lt;n</tspan><tspan dy="-2.5"> disambiguate N1 &amp; REM on short prefixes.</tspan></text>
+            </svg>
+          </div>
+        </article>
+
+        <article id="deck-page-3" class="deck-page" data-page="3" role="tabpanel" aria-labelledby="deck-tab-3" hidden>
+          <div class="deck-copy">
+            <p class="label">PAGE 03 / 04 · STOPPING CHANGES HISTORY</p>
+            <h3>Unacquired suffixes vanish from history and shift deployment</h3>
+            <p>When an adaptive policy stops acquiring epoch <code>m</code> at prefix length <code>τ<sub>m</sub></code>, the remaining suffix <code>X<sub>m,τ<sub>m</sub>+1:P</sub></code> is never recorded. Later epochs can condition only on the prefixes that were actually acquired.</p>
+            <div class="equation-box" aria-label="Equations 2 and 3, stopping-dependent history">
+              <span class="eq-tag">EQS. (2)–(3) · STOPPING-DEPENDENT OBSERVATION</span>
+              <code>H<sub>n</sub>(τ<sub>&lt;n</sub>) = (X<sub>1,1:τ<sub>1</sub></sub>, …, X<sub>n−1,1:τ<sub>n−1</sub></sub>)</code>
+              <code>O<sub>n,k</sub> = (H<sub>n</sub>(τ<sub>&lt;n</sub>), X<sub>n,1:k</sub>)</code>
+            </div>
+            <ul class="deck-points">
+              <li><strong>Challenge 1 — Causal variable-length memory:</strong> How to compress variable-length prior prefixes <code>1..τ<sub>m</sub></code> into a compact memory without leaking unacquired suffixes or recomputing past epochs at every patch.</li>
+              <li><strong>Challenge 2 — Policy-induced history shift:</strong> A backbone trained solely on complete 30 s histories (<code>τ<sub>m</sub> = 30</code>) suffers a covariate shift at deployment when given stopper-truncated histories across all eight cost settings (mean E[τ] ≈ 1.1–21 s), losing <strong>0.89–12.02 macro-F1 pp</strong> across datasets and costs.</li>
+            </ul>
+            <p class="source">Manuscript §I, §III (Eqs. 2–3), §IV-D, §V-D</p>
+          </div>
+          <div class="deck-visual">
+            <div class="schematic-head"><span>TRAINING VS. DEPLOYMENT HISTORIES</span><span>SHIFT MECHANISM</span></div>
+            <svg viewBox="0 0 500 288" role="img" aria-label="Illustration of full 30 second history during Full-only training versus stopper-truncated histories across all eight cost settings (mean 1.1 to 21 seconds) at deployment, showing a 0.89 to 12.02 pp complete-to-policy gap and a 0.27 to 2.10 pp reduction in switching sensitivity from paired-history training.">
+              <defs>
+                <pattern id="deck3-hatch" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M-2 2L2-2M0 8L8 0M6 10L10 6" stroke="#95aaca" stroke-width="1"/></pattern>
+              </defs>
+              <rect x="0" y="0" width="500" height="288" fill="#fbfdff"/>
+
+              <rect x="12" y="14" width="476" height="98" rx="8" fill="#ffffff" stroke="#d6e2f2"/>
+              <text x="24" y="34" fill="var(--text)" font-size="11">FULL-ONLY TRAINING (τ_m = 30 s)</text>
+              <rect x="24" y="46" width="120" height="28" rx="3" fill="#3c6bd4"/>
+              <text x="84" y="64" fill="#ffffff" font-size="10.5" text-anchor="middle">Epoch m-1 (30 s)</text>
+              <rect x="154" y="46" width="120" height="28" rx="3" fill="#3c6bd4"/>
+              <text x="214" y="64" fill="#ffffff" font-size="10.5" text-anchor="middle">Epoch m (30 s)</text>
+              <line x1="274" y1="60" x2="306" y2="60" stroke="#1e40af" stroke-width="2"/>
+              <polygon points="310,60 302,56 302,64" fill="#1e40af"/>
+              <rect x="312" y="46" width="162" height="28" rx="3" fill="#d9e8ff" stroke="#1e40af"/>
+              <text x="393" y="64" fill="var(--text)" font-size="10.5" text-anchor="middle">Epoch n expects 30 s</text>
+              <text x="24" y="98" fill="var(--dim)" font-size="10.5">Complete context always present during Full-only training.</text>
+
+              <rect x="12" y="122" width="476" height="30" rx="4" fill="#ffedd5" stroke="#a44813"/>
+              <text x="250" y="141" fill="var(--endpoint)" font-size="10.2" font-weight="700" text-anchor="middle">COMPLETE→POLICY GAP: −0.89 to −12.02 MF1 pp (missing EEG + shift)</text>
+
+              <rect x="12" y="162" width="476" height="114" rx="8" fill="#f1f6ff" stroke="#91abd4"/>
+              <text x="24" y="182" fill="var(--blue)" font-size="11" font-weight="700">DEPLOYMENT POLICY (τ_m ≈ 1.1–21 s, 8 costs)</text>
+              <rect x="24" y="194" width="24" height="28" fill="#3c6bd4"/>
+              <rect x="48" y="194" width="6" height="28" fill="#a44813"/>
+              <rect x="54" y="194" width="90" height="28" fill="url(#deck3-hatch)" stroke="#95aaca"/>
+              <text x="99" y="212" fill="var(--dim)" font-size="9.5" text-anchor="middle">UNACQUIRED</text>
+
+              <rect x="154" y="194" width="20" height="28" fill="#3c6bd4"/>
+              <rect x="174" y="194" width="6" height="28" fill="#a44813"/>
+              <rect x="180" y="194" width="94" height="28" fill="url(#deck3-hatch)" stroke="#95aaca"/>
+              <text x="227" y="212" fill="var(--dim)" font-size="9.5" text-anchor="middle">UNACQUIRED</text>
+
+              <line x1="274" y1="208" x2="306" y2="208" stroke="#a44813" stroke-width="2"/>
+              <polygon points="310,208 302,204 302,212" fill="#a44813"/>
+              <rect x="312" y="194" width="162" height="28" rx="3" fill="#ffffff" stroke="#1e40af"/>
+              <text x="393" y="212" fill="var(--blue)" font-size="10.5" text-anchor="middle">Epoch n sees h_m,τ only</text>
+              <text x="24" y="246" fill="var(--continue)" font-size="9.2">Paired-history cuts switching sensitivity I by 0.27–2.10 pp (see Evidence Tab 2).</text>
+              <text x="24" y="264" fill="var(--dim)" font-size="10.5">Suffix X_{m,τ+1:30} never acquired or seen by later epochs.</text>
+            </svg>
+          </div>
+        </article>
+
+        <article id="deck-page-4" class="deck-page deck-page-arch" data-page="4" role="tabpanel" aria-labelledby="deck-tab-4" hidden>
+          <div class="deck-copy">
+            <p class="label">PAGE 04 / 04 · THE PAUSE FRAMEWORK</p>
+            <h3>Three coupled mechanisms unify sensing, memory, and stopping</h3>
+            <div class="pillar-list">
+              <div class="pillar">
+                <p class="label">1 · CAUSAL ENDPOINT-MEMORY BACKBONE</p>
+                <p>Converts 1 s patches to <strong>PSD100</strong> (128-band log-periodogram, 0.39–50 Hz), embeds via a gated <strong>SwiGLU</strong> MLP and left-causal conv stem, and applies a 7-block causal Transformer with <strong>2D RoPE</strong> (patch &amp; epoch axes) retaining <strong>1 KV pair per epoch per layer</strong> across all 7 blocks (434 KiB total attention cache including the 30-patch local cache over 32 epochs). Trained with prior-free class-balanced <strong>LSEL</strong> (Log-Sum-Exp Loss) so majority stages do not dominate.</p>
+              </div>
+              <div class="pillar">
+                <p class="label">2 · UTILITY-AWARE FINITE-HORIZON STOPPER</p>
+                <p>Decouples evidence learning from calibration by scaling prior-free logits via per-prefix temperature <strong>T<sub>k</sub></strong> before adding the outer empirical prior <strong>log π̂</strong>—keeping rare stages un-suppressed during feature learning while restoring calibrated posteriors under deployment priors. Scores stop risk via misclassification matrix <strong>Λ<sub>c,a</sub> = ρ w<sub>c</sub> I[c ≠ a]</strong> (<strong>ρ = 10</strong>, tempered class exponent <strong>α = 0.5</strong>), and estimates continuation risk via <strong>29 sparse variational GPs</strong> (k = 1..29; stopping is forced at k = 30).</p>
+              </div>
+              <div class="pillar">
+                <p class="label">3 · PAIRED-HISTORY TRAINING</p>
+                <p>Pairs each window’s full history (<strong>τ<sup>F</sup> = P = 30</strong>) with independently sampled random endpoint histories (<strong>τ<sup>R</sup> ~ Unif{1..P}</strong>), preserving dense supervision across all 30 current-epoch prefixes to adapt the backbone to policy-induced context.</p>
+              </div>
+            </div>
+            <div class="deck-cta-row">
+              <a class="jump" href="#replay">Step through the 2-epoch replay <span aria-hidden="true">↓</span></a>
+              <span class="source">Manuscript §IV · Fig. 1, Eqs. (4)–(14)</span>
+            </div>
+          </div>
+          <div class="deck-visual">
+            <figure class="deck-figure">
+              <div class="schematic-head"><span>MANUSCRIPT FIG. 1 · PAUSE ARCHITECTURE</span><span>CLICK IMAGE FOR FULL-RES ↗</span></div>
+              <a href="pause-architecture.png" aria-label="Open full-resolution PAUSE architecture overview (Figure 1)">
+                <img src="pause-architecture.png" alt="PAUSE overview (Figure 1): (1) Causal endpoint-memory backbone attends to the current EEG prefix and retained earlier stopping endpoints; (2) Utility-aware stopper compares immediate stopping risk against continuation risk plus acquisition cost; (3) Paired-history training uses full and randomly truncated histories with dense class-balanced LSEL." width="1248" height="608">
+              </a>
+              <figcaption>Boxes denote 1 s EEG patches; green boxes mark stopping endpoints carried into future epochs.</figcaption>
+            </figure>
+          </div>
+        </article>
+      </div>
+
+      <div class="deck-footer" role="navigation" aria-label="Brief page controls">
+        <button type="button" id="deck-prev" disabled>← Previous</button>
+        <span id="deck-status" class="deck-status" aria-live="polite">Page 1 of 4</span>
+        <button type="button" id="deck-next">Next →</button>
       </div>
     </section>
 
     <section class="shell section" id="replay" data-step="0" data-state="ready" aria-labelledby="replay-title">
       <div class="section-intro">
+        <p class="label">INTERACTIVE MECHANISM TRACE</p>
         <h2 id="replay-title">Follow two epochs</h2>
-        <p>Step through this illustrative trace or play it. Try both acquisition costs to see which endpoint reaches the next epoch.</p>
+        <p>Step through or play this illustrative 2-epoch trace. Toggle acquisition cost (η) and endpoint memory to observe how stopping in Epoch 1 governs Epoch 2’s risk trajectory.</p>
       </div>
       <div class="instrument">
         <div class="instrument-bar">
-          <label for="scenario">Acquisition cost <select id="scenario"><option value="higher">Higher</option><option value="lower">Lower</option></select></label>
+          <div class="instrument-selects">
+            <label for="scenario">Acquisition cost
+              <select id="scenario">
+                <option value="higher">Higher cost (η = 0.5)</option>
+                <option value="lower">Lower cost (η = 0.02)</option>
+              </select>
+            </label>
+            <label for="history-mode">History mode
+              <select id="history-mode">
+                <option value="with-memory">With endpoint memory</option>
+                <option value="no-memory">No memory (counterfactual)</option>
+              </select>
+            </label>
+          </div>
           <div class="instrument-controls" role="group" aria-label="Replay controls">
             <button class="primary" type="button" id="replay-step">Acquire 1 s</button>
+            <button type="button" id="replay-back" disabled>Step back</button>
             <button type="button" id="replay-play">Play</button>
             <button type="button" id="replay-reset">Reset</button>
           </div>
@@ -72,54 +466,159 @@
           </div>
           <div class="risk">
             <div class="sequence-title"><strong>Stop vs. continue risk</strong><span id="cursor-label">READY</span></div>
+            <div class="epoch-switcher" role="group" aria-label="Inspect epoch risk curve">
+              <button type="button" class="epoch-tab" id="epoch-tab-auto" aria-pressed="true">Auto-follow</button>
+              <button type="button" class="epoch-tab" id="epoch-tab-1" aria-pressed="false">Epoch 1 (N2)</button>
+              <button type="button" class="epoch-tab" id="epoch-tab-2" aria-pressed="false">Epoch 2 (N1)</button>
+            </div>
             <svg id="risk-chart" viewBox="0 0 420 170" role="img" aria-label="Risk comparison for the current prefix"></svg>
             <div class="risk-key"><span><i class="stop-line"></i> Stop risk</span><span><i class="continue-line"></i> Continue risk incl. cost</span></div>
           </div>
         </div>
-        <p class="instrument-caption">Playback jumps to the next epoch boundary after a stop.</p>
+        <p class="instrument-caption"><strong>Illustrative trace:</strong> Synthetic schematic trajectories on the paper’s ρ = 10 penalty scale (0–7 risk axis), displaying the live Bayes prediction ŷ<sub>n,k</sub> alongside the stopping rule and endpoint-memory carry across two epochs (playback jumps to Epoch 2 after Epoch 1 stops). Real DREAMS-SUB trajectories at η = 0.02 appear on the same ρ = 10 scale in <a href="#risk-figure">Supplement Fig. 6 below</a>.</p>
       </div>
-      <noscript><p>Enable JavaScript for the walkthrough and dataset selector. The published risk figure and study scope are available below.</p></noscript>
+      <noscript><p>Enable JavaScript for the interactive 4-page deck controls, 2-epoch replay, and dataset explorer. The published figures and study scope remain available below.</p></noscript>
       <div class="method-notes">
-        <article><p class="label">AT EACH PATCH</p><h3>Compare two risks</h3><p>Stop risk is the smallest expected class-weighted error cost under the calibrated posterior. Continue risk adds the cost of one more patch to a GP estimate of future risk. Stop at the first qualifying patch, or at 30 s.</p></article>
-        <article><p class="label">BETWEEN EPOCHS</p><h3>Carry only what was seen</h3><p>At inference, the causal backbone uses the current prefix and each earlier stopping endpoint within the current block. It never sees the skipped suffix or future epochs. Memory resets every 32 epochs in the main evaluation.</p></article>
-        <article><p class="label">DURING TRAINING</p><h3>Vary the available history</h3><p>The same EEG window is trained with full and randomly truncated historical endpoints. Both views still supervise every current prefix. This prepares the backbone for the histories generated by the stopper.</p></article>
+        <article>
+          <p class="label">AT EACH PATCH</p>
+          <h3>Compare calibrated risks</h3>
+          <p>Prior-free scores are scaled by per-prefix temperatures T<sub>k</sub> before adding outer prior log π̂, keeping rare stages un-suppressed during feature learning while restoring calibrated posteriors under deployment priors. Stop risk uses Λ<sub>c,a</sub> = ρ w<sub>c</sub> I[c ≠ a] (ρ = 10, tempered class exponent α = 0.5); continue risk adds η to the predictive mean of 29 sparse variational GPs (k = 1..29; stopping is forced at k = 30).</p>
+        </article>
+        <article>
+          <p class="label">BETWEEN EPOCHS</p>
+          <h3>Carry 1 KV pair per endpoint</h3>
+          <p>Causal attention with 2D RoPE (patch and epoch axes) over 1 s <strong>PSD100</strong> (128-band log-periodogram, 0.39–50 Hz) tokens attends to the current prefix and 1 KV pair per epoch per layer across all 7 blocks (434 KiB total attention cache including the 30-patch local cache over 32 epochs). Skipped suffixes and future epochs are never seen.</p>
+        </article>
+        <article>
+          <p class="label">DURING TRAINING</p>
+          <h3>Pair full &amp; random histories</h3>
+          <p>Each window pairs complete histories (τ<sup>F</sup> = 30) with independently truncated histories (τ<sup>R</sup> ~ Unif{1..30}), optimizing dense prior-free class-balanced <strong>LSEL</strong> (Log-Sum-Exp Loss) across all 30 current prefixes to counter policy-induced history shift.</p>
+        </article>
       </div>
-      <p class="source">Manuscript §III–IV · Fig. 1, Eqs. (9)–(12), Algorithm 1</p>
+      <p class="source">Manuscript §III–IV · Fig. 1, Eqs. (4)–(14), Algorithm 1</p>
     </section>
 
     <section class="evidence-wrap" id="evidence" aria-labelledby="evidence-title">
       <div class="shell section">
         <div class="section-intro">
+          <p class="label">EMPIRICAL EVALUATION · 20 HELD-OUT FOLDS</p>
           <h2 id="evidence-title">What the evaluation found</h2>
-          <p>Compare the first evaluated PAUSE point above the strongest ECTS baseline’s peak macro-F1 on each dataset.</p>
+          <p>Inspect dataset-by-dataset Pareto gains over instance-wise ECTS baselines, full speed–accuracy curves, component ablations, the 4×8 history-switch matrix, frozen-backbone policy checks, and online latency.</p>
         </div>
+
         <div class="data-panel">
-          <div class="data-top"><h3>Mean EEG acquired per epoch</h3><label for="dataset">Dataset <select id="dataset"></select></label></div>
+          <div class="data-top">
+            <div class="data-title-group">
+              <h3>Mean EEG acquired per epoch</h3>
+              <span id="dataset-meta" class="dataset-meta">20,242 epochs · Cz-A1 · 20-fold CV</span>
+            </div>
+            <label for="dataset">Dataset <select id="dataset"></select></label>
+          </div>
           <div id="results" aria-live="polite" aria-atomic="true"></div>
-          <p class="source">Manuscript §V-A–B · Fig. 2, Table II · EARLIEST, ECONOMY-γ-Max, EarlyMix, and FIRMBOUND · Pooled held-out results across 20 subject-wise folds.</p>
+          <p class="pareto-def"><strong>Matched-budget Pareto gain:</strong> signed mean MF1 gap between PAUSE and the best-baseline upper envelope over their shared non-dominated budget interval, holding comparators flat at their peak rightward with no left extrapolation.</p>
+          <p class="source" id="system-source">Manuscript §V-B, Fig. 2 (p. 7); PAUSE operating points also appear in Table II (p. 8) and low-budget baseline comparison in Table I (p. 8) · Pooled held-out results across 20 subject-wise folds.</p>
         </div>
-        <div class="paired-evidence">
-          <article><h3>Effect of paired-history training</h3><p class="metric">0.27–2.10 pp</p><p>Reduction in macro-F1 loss when switching from complete to shared policy histories, after accounting for the paired model’s gain on complete histories. The reduction was positive in all 32 dataset–cost settings.</p><p class="source">Manuscript §V-D · Fig. 3, Eq. (15) · Equal fold weights</p></article>
-          <article><h3>Gain with the same backbone</h3><p class="metric">+1.78–3.92 pp</p><p>Average matched-budget macro-F1 gain over the envelope of Fixed, Threshold, AAGC, and class-neutral GP policies. PAUSE shares the backbone and calibration with these controls and uses a class-weighted Bayes action.</p><p class="source">Manuscript §V-E · Fig. 4, Table III(c)</p></article>
+
+        <figure class="paper-figure" id="frontier-figure">
+          <div class="figure-top">
+            <h3>Speed–accuracy frontiers across all four datasets</h3>
+            <span class="label">MANUSCRIPT FIG. 2</span>
+          </div>
+          <a href="pause-main-results.png" aria-label="Open full-resolution speed-accuracy frontier plots (Manuscript Figure 2)">
+            <img src="pause-main-results.png" alt="Manuscript Figure 2: Overall macro-F1 (top row) and N1 F1 (bottom row) versus mean EEG acquisition time across DREAMS-SUB, Sleep-EDF-20, Sleep-EDF-78, and SHHS, comparing PAUSE against EARLIEST, ECONOMY-gamma-Max, EarlyMix, and FIRMBOUND." loading="lazy" width="1906" height="802">
+          </a>
+          <figcaption>Overall macro-F1 versus mean acquisition length E[τ] (top) and N1 F1 versus E[τ | y = N1] (bottom) across all four datasets. Shaded areas mark matched-budget Pareto gains above the strongest ECTS baseline envelope (+11.4 to +13.7 MF1 pp overall; +13.3 to +19.5 pp on N1). <span class="source">Manuscript §V-B, Fig. 2 (p. 7)</span></figcaption>
+        </figure>
+
+        <div class="evidence-tabs" aria-label="Deep-dive evidence explorer">
+          <div class="evidence-tabs-head">
+            <div>
+              <p class="label">DEEP-DIVE EVIDENCE EXPLORER</p>
+              <h3>Ablations, history shift, policy &amp; online evaluation</h3>
+            </div>
+          </div>
+          <div class="evidence-tablist" id="evidence-tablist" role="tablist" aria-label="Evidence categories">
+            <button type="button" class="ev-tab" id="ev-tab-ablations" role="tab" data-ev-tab="ablations" aria-selected="true" aria-controls="ev-panel-ablations" tabindex="0">Component Ablations</button>
+            <button type="button" class="ev-tab" id="ev-tab-history" role="tab" data-ev-tab="history" aria-selected="false" aria-controls="ev-panel-history" tabindex="-1">History-Switch Matrix (4×8)</button>
+            <button type="button" class="ev-tab" id="ev-tab-policy" role="tab" data-ev-tab="policy" aria-selected="false" aria-controls="ev-panel-policy" tabindex="-1">Policy &amp; 30 s Backbone</button>
+            <button type="button" class="ev-tab" id="ev-tab-online" role="tab" data-ev-tab="online" aria-selected="false" aria-controls="ev-panel-online" tabindex="-1">Spectral &amp; Online vs. MASS</button>
+          </div>
+          <div id="evidence-detail" class="evidence-detail">
+            <div id="ev-panel-ablations" class="ev-panel" role="tabpanel" aria-labelledby="ev-tab-ablations"></div>
+            <div id="ev-panel-history" class="ev-panel" role="tabpanel" aria-labelledby="ev-tab-history" hidden></div>
+            <div id="ev-panel-policy" class="ev-panel" role="tabpanel" aria-labelledby="ev-tab-policy" hidden></div>
+            <div id="ev-panel-online" class="ev-panel" role="tabpanel" aria-labelledby="ev-tab-online" hidden></div>
+          </div>
         </div>
-        <figure class="paper-figure">
-          <div class="figure-top"><h3>Risk trajectories from DREAMS-SUB</h3></div>
-          <a href="risk-trajectories.png" aria-label="Open the full-resolution published risk plot"><img src="risk-trajectories.png" alt="Five DREAMS-SUB risk plots, one example per reference sleep stage. The stopping and continuation risks can fluctuate; a filled marker identifies the first stop." loading="lazy" width="2085" height="940"></a>
-          <figcaption>Five DREAMS-SUB examples at acquisition cost η = 0.02. Solid orange: immediate stop risk. Dashed green: fitted continuation risk, including acquisition cost. Filled markers indicate the first qualifying stop. Points beyond a stop are offline counterfactual diagnostics and were unavailable to the policy. <span class="source">Supplement §VII-C · Fig. 6</span></figcaption>
+
+        <figure class="paper-figure" id="risk-figure">
+          <div class="figure-top">
+            <h3>Risk trajectories from DREAMS-SUB</h3>
+            <span class="label">SUPPLEMENT FIG. 6</span>
+          </div>
+          <a href="risk-trajectories.png" aria-label="Open the full-resolution published risk plot">
+            <img src="risk-trajectories.png" alt="Five DREAMS-SUB risk plots, one example per reference sleep stage (W, N1, N2, N3, REM). Solid orange shows stop risk; dashed green shows continuation risk including acquisition cost; a filled marker identifies the first stop." loading="lazy" width="2085" height="940">
+          </a>
+          <figcaption>Five DREAMS-SUB examples at acquisition cost η = 0.02 on the paper’s ρ = 10 penalty scale (0–7 risk axis, matching the interactive replay above). Solid orange: immediate stop risk. Dashed green: fitted continuation risk, including acquisition cost (matching the dashed green line in the replay). Filled markers indicate the first qualifying stop. Points beyond a stop are offline counterfactual diagnostics and were unavailable to the online policy. <span class="source">Supplement §VII-C · Fig. 6 (p. 25)</span></figcaption>
         </figure>
       </div>
     </section>
 
     <section class="shell section scope" id="scope" aria-labelledby="scope-title">
-      <div class="section-intro"><h2 id="scope-title">Acquisition, power and latency</h2></div>
+      <div class="section-intro">
+        <p class="label">DEPLOYMENT &amp; BOUNDARIES</p>
+        <h2 id="scope-title">System practicality, power &amp; scope</h2>
+        <p>Measured inference footprint on a mobile host alongside datasheet AFE power estimates and explicit boundaries on what was measured.</p>
+      </div>
+
+      <div class="scope-metrics" aria-label="Key system deployment figures">
+        <article class="scope-card">
+          <p class="label">AFE POWER SAVING</p>
+          <p class="metric">31.0%–73.4%</p>
+          <p>Lower estimated AFE power at first-exceed points vs. baseline peaks (ADS1299-4: 45.2%–67.5%, ADS131A04: 52.3%–73.4%, ADS1294: 31.0%–53.1%).</p>
+        </article>
+        <article class="scope-card">
+          <p class="label">MODEL &amp; KV CACHE</p>
+          <p class="metric">2.0M · 434 KiB</p>
+          <p>7.6 MiB FP32 backbone weights and 434 KiB KV attention cache across the 32-epoch causal inference window.</p>
+        </article>
+        <article class="scope-card">
+          <p class="label">COMPUTE &amp; GP OVERHEAD</p>
+          <p class="metric">2.09 MMACs</p>
+          <p>4.19 MFLOPs per 1 s patch; 29 precomputed sparse GP regressors add 4.42 kMACs/step (0.21% backbone) and 0.28 MB.</p>
+        </article>
+        <article class="scope-card">
+          <p class="label">1 Hz CPU LATENCY</p>
+          <p class="metric">9.44 ms</p>
+          <p>Dimensity 9500 single-thread FP32 median (18.80 ms p99; 105× below 1 s interval; ~76 ms or 0.25% duty cycle at 8 patches/epoch).</p>
+        </article>
+      </div>
+
       <dl>
-        <div><dt>Acquired EEG</dt><dd>The reported seconds count observed signal per 30 s epoch. At the first evaluated PAUSE point above the strongest ECTS peak, the baseline used 6.0–6.8 times as much EEG at its own peak operating point.</dd></div>
-        <div><dt>Front-end power</dt><dd>The analog front-end savings are estimated from datasheet active and standby powers and the acquisition lengths. They do not measure end-to-end wearable energy or battery life.</dd></div>
-        <div><dt>Inference latency</dt><dd>On the tested Dimensity 9500 mobile host, single-thread CPU backbone inference at the 1 Hz patch cadence took 9.44 ms median and 18.80 ms p99 with scheduler assignment. This is the compute time for a patch, separate from the time spent acquiring it.</dd></div>
+        <div>
+          <dt>Acquired EEG</dt>
+          <dd>Reported seconds count observed 100 Hz signal per 30 s epoch. PAUSE surpasses all baseline peaks at 3.62–4.94 s, reducing acquisition by 6.0–6.8× versus each strongest baseline’s peak (23.67–29.76 s) and leaving 83.53%–87.93% of each 30 s epoch unacquired.</dd>
+        </div>
+        <div>
+          <dt>Front-end power</dt>
+          <dd>Analog front-end savings are analytically modeled from datasheet active and standby powers (ADS1299-4: 22.0 / 5.1 mW; ADS131A04: 15.8 / 2.6 mW; ADS1294: 10.1 / 4.0 mW) plus standby ratios, neglecting 0.002–0.11 mW wake-up recovery. Standby already comprises 54.5%–84.5% of PAUSE’s remaining AFE power; these figures do not measure end-to-end wearable battery life.</dd>
+        </div>
+        <div>
+          <dt>Inference latency</dt>
+          <dd>On a Dimensity 9500 mobile host (ONNX Runtime 1.28, single CPU thread, FP32, thermal steady state), 1 Hz scheduler-assigned patch inference took 9.44 ms median and 18.80 ms p99 (with 1.1%–1.3% stopper overhead in back-to-back runs). This is compute time per patch, distinct from physical EEG acquisition duration.</dd>
+        </div>
+        <div>
+          <dt>Evaluation scope</dt>
+          <dd>All evaluations use fixed subject-wise 20-fold partitions across four public PSG cohorts (20,242 + 40,293 + 162,456 + 324,148 = 547,139 pooled epochs in 32-epoch causal inference blocks), evaluating causal prefix stopping on recorded datasets alongside datasheet AFE power modeling and mobile CPU latency measurement rather than end-to-end wearable hardware trials.</dd>
+        </div>
       </dl>
-      <p class="source">Manuscript §V-B, §V-G · Fig. 2, Tables VII–VIII</p>
+      <p class="source">Manuscript §V-A–B, §V-G · Fig. 2, Tables VII–VIII</p>
     </section>
   </main>
-  <footer class="site-footer shell"><span>PAUSE / ICDE 2027 REVIEWER WALKTHROUGH</span><a href="#main">Back to top ↑</a></footer>
+
+  <footer class="site-footer shell">
+    <span>PAUSE / ICDE 2027 REVIEWER WALKTHROUGH</span>
+    <a href="#main">Back to top ↑</a>
+  </footer>
 </body>
 </html>

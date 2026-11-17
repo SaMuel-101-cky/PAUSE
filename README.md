@@ -1,6 +1,6 @@
 # PAUSE
 
-Code for **Beyond Instance-Wise Early Classification: Resource-Efficient Sleep Staging with Stopping-Dependent Cross-Epoch Learning**.
+Code for **Beyond Instance-Wise Early Classification: Adaptive EEG Acquisition with Stopping-Dependent History for Sleep Staging**.
 
 [Code and reproduction guide](code/README.md) · [Supplementary material](PAUSE_Supplementary_ICDE2027.pdf)
 
